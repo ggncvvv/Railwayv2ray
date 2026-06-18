@@ -1,43 +1,33 @@
-# Step 1: V2Ray ရဲ့ ပုံမှန် Base Image ကို ယူပါမယ်
-FROM v2fly/v2fly-core:v4.45.2
+FROM --platform=linux/amd64 ubuntu:22.04
 
-# Step 2: Cloudflare Tunnel (cloudflared) ကို ဒေါင်းလုဒ်ဆွဲပြီး သွင်းပါမယ်
-# (alpine base ဖြစ်တဲ့အတွက် wget နဲ့ libc compatibility အတွက် ထည့်သွင်းထားပါတယ်)
-RUN apk add --no-cache libc6-compat wget ca-certificates && \
-    wget -O /usr/local/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 && \
-    chmod +x /usr/local/bin/cloudflared
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Step 3: V2Ray ရဲ့ Configuration ဖိုင်ကို ထည့်သွင်းခြင်း
-RUN mkdir -p /etc/v2ray && \
-    echo '{\
-  "inbounds": [{\
-    "port": 4444,\
-    "protocol": "vmess",\
-    "settings": {\
-      "clients": [{\
-        "id": "11111111-2222-3333-4444-555555555555",\
-        "alterId": 0\
-      }]\
-    },\
-    "streamSettings": {\
-      "network": "ws",\
-      "wsSettings": {\
-        "path": "/v2ray"\
-      }\
-    }\
-  }],\
-  "outbounds": [{ \
-    "protocol": "freedom",\
-    "settings": {}\
-  }]\
-}' > /etc/v2ray/config.json
+# ၁။ လိုအပ်တဲ့ Base Packages တွေ အကုန်လုံးကို အမှားကင်းအောင် တစ်ခါတည်း သွင်းခြင်း
+RUN apt update -y && apt install --no-install-recommends -y \
+    websockify sudo xterm init systemd snapd vim net-tools curl wget git tzdata screen openssh-server sshpass \
+    && apt clean && rm -rf /var/lib/apt/lists/*
 
-# Step 4: စောစောက ဆောက်ခဲ့တဲ့ start.sh ကို Docker ထဲ ထည့်ပြီး Run ခွင့် ပေးလိုက်တာပါ
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
+# ၂။ SSH Config ပြင်ဆင်ခြင်း၊ အသုံးပြုသူ (User) ဆောက်ခြင်းနှင့် Password ပေးခြင်း
+RUN rm -rf /etc/ssh/sshd_config && cd /etc/ssh && \
+    wget https://github.com/githubaunglaymyanmar/fordownload/raw/main/ssh/sshd_config && \
+    useradd -m aunglay && adduser aunglay sudo && \
+    echo 'aunglay:aunglay' | chpasswd && \
+    sed -i 's/\/bin\/sh/\/bin\/bash/g' /etc/passwd && \
+    echo "aunglay ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+    echo "root:aunglay" | chpasswd
 
-# Port 4444 ကို ဖွင့်ထားပေးခြင်း
-EXPOSE 4444
+# ၃။ vpn script ကို ဒေါင်းလုဒ်ဆွဲပြီး /usr/local/bin/vpn ထဲမှာ သိမ်းဆည်းခြင်း
+RUN wget -O /usr/local/bin/vpn https://github.com/gdhvdvb95-source/v2ray/raw/refs/heads/main/vpn && \
+    chmod +x /usr/local/bin/vpn
 
-# Container စတာနဲ့ start.sh ကို ပတ်ခိုင်းလိုက်တာပါ
-CMD ["/start.sh"]
+# Port များ ဖွင့်ပေးခြင်း
+EXPOSE 22
+EXPOSE 6080
+
+# ၄။ Container စတာနဲ့ vpn script ကို တိုက်ရိုက် run ခိုင်းခြင်း
+CMD ["/bin/bash", "/usr/local/bin/vpn"]
+
+
+
+
+
