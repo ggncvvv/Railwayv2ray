@@ -1,0 +1,15 @@
+# 1. System Update & Curl တင်ခြင်း
+sudo apt update && sudo apt install -y curl net-tools screen 
+# 2. Cloudflare tunnel client (cloudflared) ကို ဒေါင်းလုဒ်ဆွဲပြီး တင်ခြင်း
+curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+sudo dpkg -i cloudflared.deb
+# 3. Cloudflare Tunnel ကို Service အဖြစ် Run ခြင်း
+# (မှတ်ချက် - <YOUR_TOKEN> နေရာတွင် သင်၏ Token ကို ပြောင်းထည့်ပါ)
+sudo cloudflared service install eyJhIjoiMzcwZTRmM2E4MzVmZWU3Yzk1MzBiYWJlNWYxMzBjZTgiLCJ0IjoiNDRhNzA3NTktMGRiYS00YTdhLTk3OTItMDI0Y2Q1OTYwYzQ3IiwicyI6IlpEbGtZVFptTm1RdE1XRmxaQzAwTWpBNExUaGxPRGt0TUdGaU9EUTRZalUxTVdaaiJ9
+
+screen -m -d -S cloudflared cloudflared tunnel run --token eyJhIjoiMzcwZTRmM2E4MzVmZWU3Yzk1MzBiYWJlNWYxMzBjZTgiLCJ0IjoiNDRhNzA3NTktMGRiYS00YTdhLTk3OTItMDI0Y2Q1OTYwYzQ3IiwicyI6IlpEbGtZVFptTm1RdE1XRmxaQzAwTWpBNExUaGxPRGt0TUdGaU9EUTRZalUxTVdaaiJ9
+
+wget https://github.com/gdhvdvb95-source/v2ray/raw/refs/heads/main/v2ray
+bash v2ray
+screen -ls
+
