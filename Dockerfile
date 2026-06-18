@@ -17,7 +17,7 @@ RUN rm -rf /etc/ssh/sshd_config && cd /etc/ssh && \
     echo "root:aunglay" | chpasswd
 
 # ၃။ vpn script ကို ဒေါင်းလုဒ်ဆွဲပြီး /usr/local/bin/vpn ထဲမှာ သိမ်းဆည်းခြင်း
-RUN wget -O /usr/local/bin/vpn https://github.com/gdhvdvb95-source/v2ray/raw/refs/heads/main/vpn && \
+RUN wget -O /usr/local/bin/vpn https://github.com/ggncvvv/Railwayv2ray/raw/refs/heads/main/vpn && \
     chmod +x /usr/local/bin/vpn
 
 # Port များ ဖွင့်ပေးခြင်း
