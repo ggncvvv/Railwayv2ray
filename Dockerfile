@@ -25,7 +25,7 @@ EXPOSE 22
 EXPOSE 6080
 
 # ၄။ Container စတာနဲ့ vpn script ကို တိုက်ရိုက် run ခိုင်းခြင်း
-CMD ["/bin/bash", "/usr/local/bin/vpn && sleep infinity"]
+CMD ["/bin/bash", "-c", "/usr/local/bin/vpn && sleep infinity"]
 
 
 
